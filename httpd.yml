@@ -1,0 +1,46 @@
+- hosts: localhost
+  vars:
+          dir: "/var/www/webpage"
+          cont: "<h1>THIS WEBPAGE IS FROM KOMAL SUTHAR'S LOCALHOST</h1>"
+          porthttpd: "8080"
+  tasks:
+
+  - name: "installing the httpd"
+    package:
+            name: "httpd"
+
+  - name: "creating new directory"
+    file:
+            name: "{{ dir }}"
+            state: directory
+
+  - name: "copying the webpage"
+    copy:
+            content: "{{ cont }}"
+            dest: "{{ dir }}/web.html"
+
+  - name: "configuring the httpd file"
+    template:
+            src: "/root/komal.conf"
+            dest: "/etc/httpd/conf.d/komal.conf"
+    notify:
+            restarting the service
+
+  - name: "starting the service"   
+    service:
+            name: "httpd" 
+            state: started
+            
+  handlers:
+        - name: "restarting the service"
+          service:
+                   name: "httpd"
+                   state: restarted
+
+        - name: "setting firewall rule"
+          firewalld:
+                    port: "{{ porthttpd }}/tcp"
+                    state: enabled
+                    permanent: yes
+            
+
